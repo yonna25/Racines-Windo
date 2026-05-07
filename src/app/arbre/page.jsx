@@ -2,248 +2,174 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
-// ── Données ───────────────────────────────────────────────────────
+// ── Membres ───────────────────────────────────────────────────────
 const MEMBERS = {
-  ibrahim:  { ini: 'IB', name: 'Ibrahim',  role: 'Arrière-GP',  photo: null, color: '#D4C296', text: '#1B3A2F' },
-  fatou:    { ini: 'FA', name: 'Fatou',    role: 'Arrière-GM',  photo: null, color: '#D4C296', text: '#1B3A2F' },
-  mamadou:  { ini: 'MA', name: 'Mamadou',  role: 'Grand-père',  photo: null, color: '#2D5A45', text: '#FAF6EF' },
-  aminata:  { ini: 'AM', name: 'Aminata',  role: 'Grand-mère',  photo: null, color: '#2D5A45', text: '#FAF6EF' },
-  abdoul:   { ini: 'AB', name: 'Abdoul',   role: 'Père · Vous', photo: null, color: '#C8A96E', text: '#1B3A2F', isYou: true },
-  kadiatou: { ini: 'KA', name: 'Kadiatou', role: 'Mère',        photo: null, color: '#C8A96E', text: '#1B3A2F' },
-  ismael:   { ini: 'IS', name: 'Ismaël',   role: 'Fils',        photo: null, color: '#E2D4A8', text: '#1B3A2F' },
-  soumba:   { ini: 'SO', name: 'Soumba',   role: 'Fille',       photo: null, color: '#E2D4A8', text: '#1B3A2F' },
-  bamba:    { ini: 'BA', name: 'Bamba',    role: 'Fils',        photo: null, color: '#E2D4A8', text: '#1B3A2F' },
+  ibrahim:  { ini: 'IB', name: 'Ibrahim',  role: 'Arrière-GP',  photo: null, ring: '#D4C296', bg: '#EDE0BC', text: '#1B3A2F' },
+  fatou:    { ini: 'FA', name: 'Fatou',    role: 'Arrière-GM',  photo: null, ring: '#D4C296', bg: '#EDE0BC', text: '#1B3A2F' },
+  mamadou:  { ini: 'MA', name: 'Mamadou',  role: 'Grand-père',  photo: null, ring: '#2D5A45', bg: '#2D5A45', text: '#FAF6EF' },
+  aminata:  { ini: 'AM', name: 'Aminata',  role: 'Grand-mère',  photo: null, ring: '#2D5A45', bg: '#2D5A45', text: '#FAF6EF' },
+  abdoul:   { ini: 'AB', name: 'Abdoul',   role: 'Père · Vous', photo: null, ring: '#C8A96E', bg: '#C8A96E', text: '#1B3A2F', isYou: true },
+  kadiatou: { ini: 'KA', name: 'Kadiatou', role: 'Mère',        photo: null, ring: '#C8A96E', bg: '#C8A96E', text: '#1B3A2F' },
+  ismael:   { ini: 'IS', name: 'Ismaël',   role: 'Fils',        photo: null, ring: '#9AB89A', bg: '#EDE0BC', text: '#1B3A2F' },
+  soumba:   { ini: 'SO', name: 'Soumba',   role: 'Fille',       photo: null, ring: '#9AB89A', bg: '#EDE0BC', text: '#1B3A2F' },
+  bamba:    { ini: 'BA', name: 'Bamba',    role: 'Fils',        photo: null, ring: '#9AB89A', bg: '#EDE0BC', text: '#1B3A2F' },
 }
 
-// ── Layout (canvas 340 × 620) ─────────────────────────────────────
-const R = 32   // rayon de chaque cercle
-const W = 340  // largeur canvas
-const POSITIONS = {
-  ibrahim:  { x: 90,  y: 72 },
-  fatou:    { x: 250, y: 72 },
-  mamadou:  { x: 90,  y: 218 },
-  aminata:  { x: 250, y: 218 },
-  abdoul:   { x: 90,  y: 374 },
-  kadiatou: { x: 250, y: 374 },
-  ismael:   { x: 52,  y: 520 },
+// ── Positions absolues (canvas 340 × 640) ────────────────────────
+const R  = 30   // rayon cercle
+const CW = 340  // canvas width
+const NODES = {
+  ibrahim:  { x: 82,  y: 78  },
+  fatou:    { x: 258, y: 78  },
+  mamadou:  { x: 82,  y: 225 },
+  aminata:  { x: 258, y: 225 },
+  abdoul:   { x: 82,  y: 378 },
+  kadiatou: { x: 258, y: 378 },
+  ismael:   { x: 50,  y: 520 },
   soumba:   { x: 170, y: 520 },
   bamba:    { x: 292, y: 520 },
 }
 
-// ── Feuille SVG (dessinée dans le SVG global) ─────────────────────
-// cx/cy = centre du nœud, toutes les feuilles autour
-const LEAF_OFFSETS = [
-  { dx: -R - 14, dy: -R + 4,  rotate: -50, size: 11 },
-  { dx:  R + 10, dy: -R + 2,  rotate:  40, size: 11 },
-  { dx: -R - 16, dy:  6,      rotate: -80, size:  9 },
-  { dx:  R + 12, dy:  8,      rotate:  70, size:  9 },
-  { dx: -6,      dy: -R - 12, rotate:   5, size:  8 },
+// ── Grandes feuilles éparpillées (style référence) ────────────────
+const LEAVES = [
+  // Haut gauche
+  { x: 14,  y: 28,  r: -35, s: 26, c: '#2D5A45' },
+  { x: 38,  y: 10,  r:  -8, s: 22, c: '#3D6B55' },
+  { x: 60,  y: 28,  r:  22, s: 18, c: '#4A7C65' },
+  // Haut droite
+  { x: 278, y: 12,  r:  25, s: 26, c: '#2D5A45' },
+  { x: 306, y: 35,  r:  55, s: 22, c: '#3D6B55' },
+  { x: 258, y: 40,  r: -18, s: 18, c: '#4A7C65' },
+  // Milieu gauche
+  { x: 8,   y: 205, r: -62, s: 24, c: '#2D5A45' },
+  { x: 18,  y: 242, r: -30, s: 18, c: '#3D6B55' },
+  // Milieu droite
+  { x: 322, y: 198, r:  55, s: 24, c: '#2D5A45' },
+  { x: 312, y: 238, r:  78, s: 18, c: '#3D6B55' },
+  // Entre gen2 et gen3
+  { x: 150, y: 300, r:   5, s: 16, c: '#4A7C65' },
+  { x: 178, y: 316, r:  32, s: 13, c: '#3D6B55' },
+  // Bas gauche
+  { x: 10,  y: 368, r: -68, s: 22, c: '#2D5A45' },
+  { x: 22,  y: 408, r: -42, s: 16, c: '#3D6B55' },
+  // Bas droite
+  { x: 320, y: 362, r:  62, s: 22, c: '#2D5A45' },
+  { x: 308, y: 402, r:  82, s: 16, c: '#3D6B55' },
+  // Autour enfants
+  { x: 18,  y: 510, r: -52, s: 18, c: '#2D5A45' },
+  { x: 306, y: 506, r:  58, s: 18, c: '#2D5A45' },
+  { x: 142, y: 585, r:   8, s: 15, c: '#3D6B55' },
+  { x: 198, y: 582, r:  38, s: 15, c: '#4A7C65' },
 ]
 
-function LeafShape({ cx, cy, color }) {
+// Forme feuille SVG
+function Leaf({ x, y, r, s, c }) {
   return (
-    <>
-      {LEAF_OFFSETS.map((l, i) => {
-        const lx = cx + l.dx
-        const ly = cy + l.dy
-        const s = l.size
-        return (
-          <g key={i} transform={`translate(${lx},${ly}) rotate(${l.rotate})`}>
-            <path
-              d={`M0,0 C${s*0.35},-${s*0.9} ${s},-${s} ${s*0.55},-${s*1.8}
-                 C${s*0.1},-${s} -${s*0.35},-${s*0.9} 0,0 Z`}
-              fill={color}
-              opacity="0.88"
-            />
-            <line
-              x1="0" y1="0"
-              x2={s * 0.55} y2={-s * 1.8}
-              stroke="rgba(0,0,0,0.15)"
-              strokeWidth="0.5"
-            />
-          </g>
-        )
-      })}
-    </>
-  )
-}
-
-// ── Branches organiques SVG ───────────────────────────────────────
-function TreeBranches() {
-  const P = POSITIONS
-  const branchColor = '#3D6B55'
-  const coupleColor = '#C8A96E'
-  const strokeW = 1.8
-
-  // Midpoints couples (entre les deux membres)
-  const mid = (a, b) => ({ x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 })
-  const m1 = mid(P.ibrahim, P.fatou)    // gen1 milieu
-  const m2 = mid(P.mamadou, P.aminata)  // gen2 milieu
-  const m3 = mid(P.abdoul, P.kadiatou)  // gen3 milieu
-
-  return (
-    <g>
-      {/* ── Lignes couple (tirets dorés) ── */}
-      {[
-        [P.ibrahim, P.fatou],
-        [P.mamadou, P.aminata],
-        [P.abdoul, P.kadiatou],
-      ].map(([a, b], i) => (
-        <line
-          key={i}
-          x1={a.x + R} y1={a.y}
-          x2={b.x - R} y2={b.y}
-          stroke={coupleColor}
-          strokeWidth="1.4"
-          strokeDasharray="5 3"
-          opacity="0.7"
-        />
-      ))}
-
-      {/* ── Branche gen1 → gen2 (courbe bezier) ── */}
+    <g transform={`translate(${x},${y}) rotate(${r})`}>
       <path
-        d={`M ${m1.x} ${m1.y + R}
-            C ${m1.x} ${m1.y + R + 40}
-              ${m2.x} ${m2.y - R - 40}
-              ${m2.x} ${m2.y - R}`}
-        fill="none" stroke={branchColor} strokeWidth={strokeW}
+        d={`M0,0
+           C${s*0.38},-${s*0.75} ${s*0.95},-${s*1.1} ${s*0.52},-${s*2}
+           C${s*0.08},-${s*1.1} -${s*0.38},-${s*0.75} 0,0 Z`}
+        fill={c}
+        opacity="0.9"
       />
-
-      {/* ── Branche gen2 → gen3 ── */}
-      <path
-        d={`M ${m2.x} ${m2.y + R}
-            C ${m2.x} ${m2.y + R + 40}
-              ${m3.x} ${m3.y - R - 40}
-              ${m3.x} ${m3.y - R}`}
-        fill="none" stroke={branchColor} strokeWidth={strokeW}
-      />
-
-      {/* ── Tronc gen3 → enfants (ramification organique) ── */}
-      {/* Tronc principal vers le bas */}
-      <path
-        d={`M ${m3.x} ${m3.y + R}
-            C ${m3.x} ${m3.y + R + 30}
-              ${m3.x} ${m3.y + R + 50}
-              ${m3.x} ${m3.y + R + 60}`}
-        fill="none" stroke={branchColor} strokeWidth={strokeW + 0.4}
-      />
-      {/* Branche gauche → Ismaël */}
-      <path
-        d={`M ${m3.x} ${m3.y + R + 60}
-            C ${m3.x - 20} ${m3.y + R + 85}
-              ${P.ismael.x + 10} ${P.ismael.y - R - 20}
-              ${P.ismael.x} ${P.ismael.y - R}`}
-        fill="none" stroke={branchColor} strokeWidth={strokeW}
-      />
-      {/* Branche centrale → Soumba */}
-      <path
-        d={`M ${m3.x} ${m3.y + R + 60}
-            C ${m3.x} ${m3.y + R + 90}
-              ${P.soumba.x} ${P.soumba.y - R - 30}
-              ${P.soumba.x} ${P.soumba.y - R}`}
-        fill="none" stroke={branchColor} strokeWidth={strokeW}
-      />
-      {/* Branche droite → Bamba */}
-      <path
-        d={`M ${m3.x} ${m3.y + R + 60}
-            C ${m3.x + 20} ${m3.y + R + 85}
-              ${P.bamba.x - 10} ${P.bamba.y - R - 20}
-              ${P.bamba.x} ${P.bamba.y - R}`}
-        fill="none" stroke={branchColor} strokeWidth={strokeW}
-      />
+      {/* Nervure centrale */}
+      <line x1="0" y1="0" x2={s*0.52} y2={-s*2}
+            stroke="rgba(255,255,255,0.25)" strokeWidth="0.8" />
     </g>
   )
 }
 
-// ── Nœud membre (positionné en absolu) ───────────────────────────
-function MemberNode({ id, member, cx, cy, leafColor, onClick }) {
+// ── Connecteurs orthogonaux ───────────────────────────────────────
+function Branches() {
+  const N = NODES
+  const stroke = '#3D6B55'
+  const sw = 1.6
+
+  // Points clés
+  const g1mid = 170  // x milieu couple gen1
+  const g2mid = 170  // x milieu couple gen2
+  const g3mid = 170  // x milieu couple gen3
+
+  const junc12 = 152  // y jonction gen1→gen2
+  const junc23 = 302  // y jonction gen2→gen3
+  const junc34 = 458  // y jonction gen3→enfants
+
+  return (
+    <g stroke={stroke} strokeWidth={sw} fill="none" strokeLinecap="round">
+
+      {/* Barres couple (tirets dorés) */}
+      <line x1={N.ibrahim.x+R}  y1={N.ibrahim.y}  x2={N.fatou.x-R}    y2={N.fatou.y}    stroke="#C8A96E" strokeWidth="1.4" strokeDasharray="5 3" opacity="0.75" />
+      <line x1={N.mamadou.x+R}  y1={N.mamadou.y}  x2={N.aminata.x-R}  y2={N.aminata.y}  stroke="#C8A96E" strokeWidth="1.4" strokeDasharray="5 3" opacity="0.75" />
+      <line x1={N.abdoul.x+R}   y1={N.abdoul.y}   x2={N.kadiatou.x-R} y2={N.kadiatou.y} stroke="#C8A96E" strokeWidth="1.4" strokeDasharray="5 3" opacity="0.75" />
+
+      {/* Gen1 → Gen2 (Mamadou) */}
+      <polyline points={`${g1mid},${N.ibrahim.y+R} ${g1mid},${junc12} ${N.mamadou.x},${junc12} ${N.mamadou.x},${N.mamadou.y-R}`} />
+
+      {/* Gen2 → Gen3 (Abdoul) */}
+      <polyline points={`${g2mid},${N.mamadou.y+R} ${g2mid},${junc23} ${N.abdoul.x},${junc23} ${N.abdoul.x},${N.abdoul.y-R}`} />
+
+      {/* Gen3 → Enfants */}
+      {/* Tronc */}
+      <line x1={g3mid} y1={N.abdoul.y+R} x2={g3mid} y2={junc34} />
+      {/* Barre horizontale */}
+      <line x1={N.ismael.x} y1={junc34} x2={N.bamba.x} y2={junc34} />
+      {/* Montées vers chaque enfant */}
+      <line x1={N.ismael.x}  y1={junc34} x2={N.ismael.x}  y2={N.ismael.y-R} />
+      <line x1={N.soumba.x}  y1={junc34} x2={N.soumba.x}  y2={N.soumba.y-R} />
+      <line x1={N.bamba.x}   y1={junc34} x2={N.bamba.x}   y2={N.bamba.y-R} />
+
+    </g>
+  )
+}
+
+// ── Nœud ─────────────────────────────────────────────────────────
+function Node({ id, member, onClick }) {
+  const pos = NODES[id]
   const size = R * 2
 
   return (
-    <div
-      style={{
-        position: 'absolute',
-        left: cx - R,
-        top:  cy - R,
-        width: size,
-        height: size,
-        zIndex: 2,
-      }}
-    >
+    <div style={{ position: 'absolute', left: pos.x - R, top: pos.y - R, zIndex: 3 }}>
+      {/* Cercle */}
       <button
         onClick={() => onClick(id)}
-        className="group"
         style={{
-          width: '100%', height: '100%',
-          borderRadius: '50%',
-          border: `3px solid ${member.isYou ? '#FAF6EF' : member.color}`,
-          background: member.photo ? '#000' : member.color,
-          overflow: 'hidden',
+          width: size, height: size, borderRadius: '50%',
+          border: `3px solid ${member.ring}`,
+          background: member.photo ? '#000' : member.bg,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          cursor: 'pointer',
+          cursor: 'pointer', overflow: 'hidden',
           boxShadow: member.isYou
-            ? `0 0 0 4px #FAF6EF, 0 0 0 7px #C8A96E, 0 8px 24px rgba(0,0,0,0.18)`
-            : `0 4px 16px rgba(0,0,0,0.14)`,
-          transition: 'transform 0.15s',
+            ? `0 0 0 4px #FAF6EF, 0 0 0 7px ${member.ring}, 0 6px 20px rgba(0,0,0,0.2)`
+            : `0 4px 16px rgba(0,0,0,0.13)`,
+          transition: 'transform 0.12s',
         }}
-        onMouseDown={e => e.currentTarget.style.transform = 'scale(0.93)'}
-        onMouseUp={e => e.currentTarget.style.transform = 'scale(1)'}
-        onTouchStart={e => e.currentTarget.style.transform = 'scale(0.93)'}
+        onTouchStart={e => e.currentTarget.style.transform = 'scale(0.92)'}
         onTouchEnd={e => e.currentTarget.style.transform = 'scale(1)'}
       >
-        {member.photo ? (
-          <img src={member.photo} alt={member.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-        ) : (
-          <span style={{
-            fontFamily: 'Cormorant Garamond, serif',
-            fontSize: R * 0.6,
-            fontWeight: 700,
-            color: member.text,
-            userSelect: 'none',
-          }}>
-            {member.ini}
-          </span>
-        )}
+        {member.photo
+          ? <img src={member.photo} alt={member.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          : <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: R * 0.62, fontWeight: 700, color: member.text, userSelect: 'none' }}>{member.ini}</span>
+        }
       </button>
+
+      {/* Label */}
+      <div style={{ position: 'absolute', top: size + 5, left: '50%', transform: 'translateX(-50%)', width: 72, textAlign: 'center', pointerEvents: 'none' }}>
+        <p style={{ margin: 0, fontFamily: 'Cormorant Garamond, serif', fontWeight: 700, fontSize: 12, color: '#1B3A2F', lineHeight: 1.2 }}>
+          {member.name}
+        </p>
+        <p style={{ margin: 0, marginTop: 1, fontSize: 9.5, color: member.isYou ? '#C8A96E' : '#9A8878', fontStyle: member.isYou ? 'italic' : 'normal' }}>
+          {member.role}
+        </p>
+      </div>
     </div>
   )
 }
 
-// ── Label sous nœud ───────────────────────────────────────────────
-function MemberLabel({ member, cx, cy }) {
-  return (
-    <div style={{
-      position: 'absolute',
-      top: cy + R + 6,
-      left: cx - 40,
-      width: 80,
-      textAlign: 'center',
-      zIndex: 2,
-      pointerEvents: 'none',
-    }}>
-      <p style={{ margin: 0, fontFamily: 'Cormorant Garamond, serif', fontWeight: 700, fontSize: 12.5, color: '#1B3A2F', lineHeight: 1.25 }}>
-        {member.name}
-      </p>
-      <p style={{ margin: 0, marginTop: 1, fontSize: 10, color: member.isYou ? '#C8A96E' : '#9A8878', fontStyle: member.isYou ? 'italic' : 'normal' }}>
-        {member.role}
-      </p>
-    </div>
-  )
-}
-
-// ── Page principale ───────────────────────────────────────────────
+// ── Page ──────────────────────────────────────────────────────────
 export default function ArbrePage() {
   const router = useRouter()
   const [zoom, setZoom] = useState(1)
-
-  const go = (id) => router.push(`/arbre/${id}`)
-
-  const CANVAS_H = 640
-  const leafColorFor = (id) => {
-    if (['abdoul', 'kadiatou'].includes(id)) return '#C8A96E'
-    if (['mamadou', 'aminata'].includes(id)) return '#4A8C6A'
-    return '#2D5A45'
-  }
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: '#FAF6EF', fontFamily: 'DM Sans, sans-serif' }}>
@@ -254,73 +180,35 @@ export default function ArbrePage() {
         <button style={{ width: 40, height: 40, borderRadius: 10, background: 'rgba(255,255,255,0.1)', border: 'none', fontSize: 18, cursor: 'pointer' }}>⚙️</button>
       </div>
 
-      {/* Arbre scrollable */}
+      {/* Arbre */}
       <div style={{ flex: 1, background: '#FAF6EF', borderRadius: '24px 24px 0 0', marginTop: -16, overflowY: 'auto', paddingBottom: 120 }}>
-        <div style={{
-          transform: `scale(${zoom})`,
-          transformOrigin: 'top center',
-          transition: 'transform 0.25s',
-          paddingTop: 24,
-        }}>
+        <div style={{ transform: `scale(${zoom})`, transformOrigin: 'top center', transition: 'transform 0.25s', paddingTop: 20 }}>
+
           {/* Canvas positionné */}
-          <div style={{
-            position: 'relative',
-            width: W,
-            height: CANVAS_H,
-            margin: '0 auto',
-          }}>
+          <div style={{ position: 'relative', width: CW, height: 645, margin: '0 auto' }}>
 
-            {/* SVG pour branches + feuilles (couche basse) */}
-            <svg
-              width={W}
-              height={CANVAS_H}
-              style={{ position: 'absolute', inset: 0, overflow: 'visible', zIndex: 1 }}
-            >
-              {/* Branches organiques */}
-              <TreeBranches />
-
-              {/* Feuilles sur chaque nœud */}
-              {Object.entries(POSITIONS).map(([id, pos]) => (
-                <LeafShape
-                  key={id}
-                  cx={pos.x}
-                  cy={pos.y}
-                  color={leafColorFor(id)}
-                />
-              ))}
+            {/* Couche SVG : feuilles + branches */}
+            <svg width={CW} height={645} style={{ position: 'absolute', inset: 0, overflow: 'visible', zIndex: 1 }}>
+              {/* Grandes feuilles éparpillées */}
+              {LEAVES.map((l, i) => <Leaf key={i} {...l} />)}
+              {/* Connecteurs */}
+              <Branches />
             </svg>
 
-            {/* Nœuds membres (couche haute) */}
-            {Object.entries(MEMBERS).map(([id, member]) => {
-              const pos = POSITIONS[id]
-              return (
-                <div key={id}>
-                  <MemberNode id={id} member={member} cx={pos.x} cy={pos.y} onClick={go} />
-                  <MemberLabel member={member} cx={pos.x} cy={pos.y} />
-                </div>
-              )
-            })}
-
-            {/* Boutons ajouter (ancêtres inconnus) */}
-            {[{ x: 90, y: 72 - 150 }, { x: 250, y: 72 - 150 }].map((pos, i) => (
-              pos.y > 0 && null
+            {/* Nœuds */}
+            {Object.entries(MEMBERS).map(([id, m]) => (
+              <Node key={id} id={id} member={m} onClick={id => router.push(`/arbre/${id}`)} />
             ))}
+
           </div>
         </div>
 
-        {/* Contrôles zoom */}
-        <div style={{ display: 'flex', gap: 12, padding: '0 24px 8px' }}>
+        {/* Zoom */}
+        <div style={{ display: 'flex', gap: 12, padding: '4px 24px 8px' }}>
           {[['🔍 Zoom −', -0.15], ['🔎 Zoom +', 0.15]].map(([label, delta]) => (
-            <button
-              key={label}
+            <button key={label}
               onClick={() => setZoom(z => Math.min(1.5, Math.max(0.45, z + delta)))}
-              style={{
-                flex: 1, padding: '12px 0', borderRadius: 16,
-                border: '1px solid #D4C296', background: '#FFFFFF',
-                color: '#1B3A2F', fontWeight: 600, fontSize: 13,
-                cursor: 'pointer', fontFamily: 'DM Sans, sans-serif',
-              }}
-            >
+              style={{ flex: 1, padding: '12px 0', borderRadius: 16, border: '1px solid #D4C296', background: '#FFF', color: '#1B3A2F', fontWeight: 600, fontSize: 13, cursor: 'pointer' }}>
               {label}
             </button>
           ))}
@@ -328,14 +216,7 @@ export default function ArbrePage() {
       </div>
 
       {/* BottomNav */}
-      <div style={{
-        position: 'fixed', bottom: 0, left: 0, right: 0,
-        display: 'flex', justifyContent: 'space-around', alignItems: 'center',
-        padding: '8px 8px 6px',
-        background: '#FFFFFF',
-        borderTop: '1px solid rgba(45,90,69,0.08)',
-        boxShadow: '0 -4px 20px rgba(0,0,0,0.06)',
-      }}>
+      <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, display: 'flex', justifyContent: 'space-around', alignItems: 'center', padding: '8px 8px 6px', background: '#FFFFFF', borderTop: '1px solid rgba(45,90,69,0.08)', boxShadow: '0 -4px 20px rgba(0,0,0,0.06)' }}>
         {[
           { key: 'accueil',    icon: '🏠', label: 'Accueil',   href: '/dashboard' },
           { key: 'arbre',      icon: '🌳', label: 'Arbre',      href: '/arbre' },
@@ -345,20 +226,10 @@ export default function ArbrePage() {
         ].map(t => {
           const active = t.key === 'arbre'
           return (
-            <button
-              key={t.key}
-              onClick={() => router.push(t.href)}
-              style={{
-                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2,
-                padding: '4px 10px', borderRadius: 10,
-                background: active ? '#F3EDE2' : 'transparent',
-                border: 'none', cursor: 'pointer',
-              }}
-            >
+            <button key={t.key} onClick={() => router.push(t.href)}
+              style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, padding: '4px 10px', borderRadius: 10, background: active ? '#F3EDE2' : 'transparent', border: 'none', cursor: 'pointer' }}>
               <span style={{ fontSize: 20 }}>{t.icon}</span>
-              <span style={{ fontSize: 10, color: active ? '#1B3A2F' : '#9A8878', fontWeight: active ? 600 : 400 }}>
-                {t.label}
-              </span>
+              <span style={{ fontSize: 10, color: active ? '#1B3A2F' : '#9A8878', fontWeight: active ? 600 : 400 }}>{t.label}</span>
               {active && <div style={{ width: 4, height: 4, borderRadius: '50%', background: '#C8A96E' }} />}
             </button>
           )
@@ -366,5 +237,5 @@ export default function ArbrePage() {
       </div>
     </div>
   )
-    }
-      
+   }
+  
