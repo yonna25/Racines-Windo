@@ -1,228 +1,346 @@
 'use client'
 import { useEffect, useState } from 'react'
-import BaobabSVG from '@/components/BaobabSVG'
+import { useRouter } from 'next/navigation'
 
-const STARS = Array.from({ length: 60 }, (_, i) => ({
-  id: i,
-  top: `${Math.random() * 75}%`,
-  left: `${Math.random() * 100}%`,
-  size: Math.random() * 2 + 1,
-  delay: `${Math.random() * 4}s`,
-  duration: `${2.5 + Math.random() * 3}s`,
-}))
+export default function SplashScreen() {
+  const router = useRouter()
+  const [loaded, setLoaded] = useState(false)
 
-const FIGURES = [
-  { id: 'patriarch', x: 6,  w: 28, h: 85, delay: '1.2s', path: 'M14 85 L14 40 Q14 30 17 25 Q20 20 22 18 Q24 16 22 13 Q20 10 18 12 Q14 14 13 18 Q11 23 13 28 L13 85 M13 28 Q8 35 6 42 M13 28 Q9 32 4 30 M22 40 Q26 35 30 38' },
-  { id: 'grandma',   x: 13, w: 30, h: 80, delay: '1.4s', path: 'M15 80 L15 45 Q13 35 15 28 Q17 22 20 18 Q23 14 20 11 Q17 8 14 11 Q11 14 12 18 Q13 22 15 28 Q10 32 8 40 Q6 50 8 60 L8 80 M15 28 Q20 32 22 40 Q24 50 22 60 L22 80' },
-  { id: 'father',    x: 23, w: 26, h: 90, delay: '1.0s', path: 'M13 90 L13 42 Q11 32 13 24 Q15 17 17 14 Q19 11 17 8 Q15 5 12 7 Q9 9 10 14 Q11 17 13 24 M13 24 Q8 30 6 38 L5 55 M13 24 Q18 30 20 38 L21 55' },
-  { id: 'mother',    x: 32, w: 32, h: 82, delay: '1.6s', path: 'M12 82 L12 44 Q10 34 12 26 Q14 19 17 16 Q19 13 17 10 Q15 7 12 9 Q9 11 10 16 Q11 19 12 26 M12 26 Q7 32 6 40 L6 56 M12 26 Q17 32 18 40 L19 56 M20 30 Q26 26 28 22 Q29 18 26 16 Q23 14 21 18 Q19 22 20 26 Q20 30 22 32 L22 40' },
-  { id: 'child1',    x: 46, w: 20, h: 62, delay: '1.8s', path: 'M10 62 L10 32 Q9 25 10 19 Q12 14 13 12 Q14 10 13 8 Q12 6 10 7 Q8 8 9 12 Q10 14 10 19 M10 19 Q6 23 5 29 L5 40 M10 19 Q14 23 15 29 L16 40' },
-  { id: 'child2',    x: 55, w: 18, h: 52, delay: '2.0s', path: 'M9 52 L9 27 Q8 21 9 16 Q11 12 12 10 Q13 8 12 6 Q11 4 9 5 Q7 6 8 10 Q9 12 9 16 M9 16 Q6 19 5 24 L5 33 M9 16 Q12 19 13 24 L14 33' },
-  { id: 'toddler',   x: 62, w: 14, h: 40, delay: '2.2s', path: 'M7 40 L7 21 Q6 16 7 12 Q8 9 9 8 Q10 6 9 5 Q8 3 7 4 Q5 5 6 8 Q7 9 7 12 M7 12 Q4 15 4 19 L4 27 M7 12 Q10 15 10 19 L11 27' },
-]
-
-export default function SplashScreen({ onComplete }) {
-  const [phase, setPhase] = useState('loading')
   useEffect(() => {
-    const t = setTimeout(() => setPhase('ready'), 2800)
+    const t = setTimeout(() => setLoaded(true), 100)
     return () => clearTimeout(t)
   }, [])
 
   return (
-    <div
-      className="relative w-full h-screen overflow-hidden select-none"
-      style={{
-        background: 'linear-gradient(180deg, #1A0A3A 0%, #3D1A5A 15%, #7A2E1A 40%, #C96A10 65%, #E8901A 80%, #D4720A 90%, #1A0804 100%)',
-      }}
-    >
-      {/* Grain overlay */}
-      <div className="grain" />
-      <div className="geo-pattern" />
+    <div className="splash-root">
 
-      {/* Étoiles */}
-      {STARS.map(s => (
-        <div
-          key={s.id}
-          className="absolute rounded-full bg-white"
-          style={{
-            top: s.top, left: s.left,
-            width: s.size, height: s.size,
-            opacity: 0.7,
-            animation: `twinkle ${s.duration} ${s.delay} ease-in-out infinite`,
-          }}
-        />
-      ))}
+      {/* ── Background image ── */}
+      <div className="splash-bg" />
 
-      {/* Lune */}
-      <div
-        className="absolute rounded-full"
-        style={{
-          top: '8%', left: '72%',
-          width: 52, height: 52,
-          background: 'radial-gradient(circle at 35% 35%, #FFF8DC, #F0D870 60%, #D4A830)',
-          boxShadow: '0 0 24px rgba(240,216,112,0.5), 0 0 60px rgba(240,216,112,0.15)',
-          animation: 'moonGlow 4s ease-in-out infinite',
-        }}
-      />
-      {/* Petite étoile brillante */}
-      <div
-        className="absolute rounded-full"
-        style={{
-          top: '14%', left: '30%',
-          width: 6, height: 6,
-          background: '#FFF5B0',
-          boxShadow: '0 0 8px rgba(255,245,176,0.8)',
-        }}
-      />
+      {/* ── Blue night overlay ── */}
+      <div className="splash-night" />
 
-      {/* Icône app */}
-      <div
-        className="absolute flex items-center justify-center rounded-2xl"
-        style={{
-          top: '8%', left: '50%', transform: 'translateX(-50%)',
-          width: 72, height: 72,
-          background: 'linear-gradient(135deg, #E8A820, #C8800A)',
-          boxShadow: '0 8px 32px rgba(232,168,32,0.4)',
-          animation: 'fadeUp 1s ease 0.3s both',
-          fontSize: 38,
-        }}
-      >
-        🌳
+      {/* ── Sun glow behind baobab ── */}
+      <div className="splash-sun" />
+
+      {/* ── Root amber glow ── */}
+      <div className="splash-roots" />
+
+      {/* ── Top fade ── */}
+      <div className="splash-fade-top" />
+
+      {/* ── Bottom fade ── */}
+      <div className="splash-fade-bottom" />
+
+      {/* ── Grain texture ── */}
+      <div className="splash-grain" />
+
+      {/* ── WINDO label top ── */}
+      <div className={`splash-windo ${loaded ? 'splash-in-down' : 'opacity-0'}`}>
+        W I N D O
       </div>
 
-      {/* Baobab SVG */}
-      <div
-        className="absolute"
-        style={{ bottom: '22%', left: '50%', transform: 'translateX(-50%)', width: 260, opacity: 0.92 }}
-      >
-        <BaobabSVG color="#0D0602" className="w-full h-auto drop-shadow-2xl" />
-      </div>
+      {/* ── Bottom content ── */}
+      <div className="splash-content">
 
-      {/* Silhouettes personnages */}
-      <div className="absolute bottom-[21%] left-0 right-0" style={{ height: 90 }}>
-        {FIGURES.map(f => (
-          <div
-            key={f.id}
-            className="absolute bottom-0"
-            style={{ left: `${f.x}%`, width: f.w, height: f.h, animation: `fadeUp 0.8s ease ${f.delay} both` }}
-          >
-            <svg viewBox={`0 0 ${f.w} ${f.h}`} fill="none" className="w-full h-full">
-              <path
-                d={f.path}
-                stroke="#0D0602"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                fill="#0D0602"
-                fillOpacity="0.15"
-              />
-            </svg>
-          </div>
-        ))}
-      </div>
-
-      {/* Sol / herbe */}
-      <div
-        className="absolute bottom-0 left-0 right-0"
-        style={{ height: '22%', background: 'linear-gradient(180deg, #2A1A06 0%, #1A0804 100%)' }}
-      >
-        {[5, 12, 22, 35, 48, 58, 70, 80, 90].map((x, i) => (
-          <div
-            key={i}
-            className="absolute bottom-full"
-            style={{
-              left: `${x}%`, width: 1, height: 8 + (i % 3) * 4,
-              background: '#3A2A08', borderRadius: 2,
-              transform: `rotate(${(i % 2 === 0 ? -1 : 1) * 8}deg)`,
-            }}
-          />
-        ))}
-      </div>
-
-      {/* Texte + CTA */}
-      <div
-        className="absolute bottom-0 left-0 right-0 flex flex-col items-center pb-10 z-50"
-        style={{
-          background: 'linear-gradient(0deg, rgba(26,8,4,0.97) 0%, rgba(26,8,4,0.75) 55%, transparent 100%)',
-          paddingTop: 60,
-        }}
-      >
-        {/* Titre */}
-        <p
-          className="font-display font-bold tracking-wide mb-2"
-          style={{
-            fontSize: 64,
-            color: '#FFFFFF',
-            fontFamily: 'Cormorant Garamond, serif',
-            lineHeight: 1,
-            animation: 'fadeUp 1s ease 0.5s both',
-          }}
-        >
+        <h1 className={`splash-title ${loaded ? 'splash-in-up' : 'opacity-0'}`}
+            style={{ animationDelay: '0.3s' }}>
           Racines
+        </h1>
+
+        <p className={`splash-tagline ${loaded ? 'splash-in-up' : 'opacity-0'}`}
+           style={{ animationDelay: '0.5s' }}>
+          Ta lignée · Ton histoire
         </p>
 
-        {/* Sous-titre */}
-        <p
-          className="font-display italic text-center text-base font-light mb-4 px-8"
-          style={{
-            color: 'rgba(255,255,255,0.7)',
-            fontFamily: 'Cormorant Garamond, serif',
-            animation: 'fadeUp 1s ease 0.7s both',
-            letterSpacing: '0.04em',
-          }}
-        >
-          Ta lignée · Ton histoire · Ta mémoire
-        </p>
-
-        {/* Séparateur diamant */}
-        <div
-          className="flex items-center gap-3 mb-8"
-          style={{ animation: 'fadeUp 1s ease 0.9s both' }}
-        >
-          <div className="h-px w-16" style={{ background: 'rgba(200,160,48,0.4)' }} />
-          <div style={{ color: '#C8A030', fontSize: 10 }}>♦</div>
-          <div className="h-px w-16" style={{ background: 'rgba(200,160,48,0.4)' }} />
+        {/* ornament */}
+        <div className={`splash-ornament ${loaded ? 'splash-in-up' : 'opacity-0'}`}
+             style={{ animationDelay: '0.7s' }}>
+          <span className="orn-line" />
+          <span className="orn-diamond" />
+          <span className="orn-line orn-line-rev" />
         </div>
 
-        {/* Bouton ou loader */}
-        {phase === 'ready' ? (
-          <button
-            onClick={onComplete}
-            className="w-4/5 py-4 rounded-full font-sans font-black tracking-[0.2em] uppercase text-sm transition-all duration-300 hover:scale-105 active:scale-95"
-            style={{
-              background: 'linear-gradient(135deg, #E8A820, #C8800A)',
-              color: '#1A0804',
-              border: 'none',
-              boxShadow: '0 4px 28px rgba(232,168,32,0.45)',
-              animation: 'fadeUp 0.7s ease both',
-            }}
-          >
-            Commencer
-          </button>
-        ) : (
-          <div
-            className="relative w-40 h-0.5 rounded-full overflow-hidden"
-            style={{ background: 'rgba(200,169,110,0.15)', animation: 'fadeUp 1s ease 1.1s both' }}
-          >
-            <div className="loader-bar absolute inset-0" />
-          </div>
-        )}
-
-        {/* Déjà membre */}
-        <p
-          className="font-sans text-xs mt-5"
-          style={{ color: 'rgba(255,255,255,0.4)', animation: 'fadeUp 1s ease 1.2s both' }}
+        <button
+          className={`splash-cta ${loaded ? 'splash-in-up' : 'opacity-0'}`}
+          style={{ animationDelay: '0.9s' }}
+          onClick={() => router.push('/dashboard')}
         >
-          Déjà membre ?{' '}
-          <span
-            className="underline cursor-pointer"
-            style={{ color: 'rgba(255,255,255,0.65)' }}
-          >
-            Se connecter
-          </span>
-        </p>
+          COMMENCER
+        </button>
+
+        <button
+          className={`splash-signin ${loaded ? 'splash-in-up' : 'opacity-0'}`}
+          style={{ animationDelay: '1.1s' }}
+          onClick={() => router.push('/login')}
+        >
+          Déjà membre ? <span>Se connecter</span>
+        </button>
+
       </div>
+
+      <style jsx>{`
+        .splash-root {
+          position: fixed;
+          inset: 0;
+          overflow: hidden;
+          background: #030814;
+          font-family: 'Cinzel', serif;
+        }
+
+        /* Background baobab image */
+        .splash-bg {
+          position: absolute;
+          inset: 0;
+          background-image: url('/images/baobab.png');
+          background-size: cover;
+          background-position: center 20%;
+        }
+
+        /* Deep blue night overlay */
+        .splash-night {
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(
+            180deg,
+            rgba(3,8,30,0.65) 0%,
+            rgba(8,18,60,0.50) 15%,
+            rgba(15,35,90,0.35) 30%,
+            rgba(25,55,110,0.20) 45%,
+            rgba(40,70,120,0.10) 60%,
+            transparent 75%
+          );
+        }
+
+        /* Golden sun glow center */
+        .splash-sun {
+          position: absolute;
+          top: 28%;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 260px;
+          height: 260px;
+          border-radius: 50%;
+          background: radial-gradient(
+            circle,
+            rgba(255,180,60,0.22) 0%,
+            rgba(220,130,20,0.10) 45%,
+            transparent 70%
+          );
+          filter: blur(24px);
+          animation: sunPulse 5s ease-in-out infinite;
+        }
+
+        /* Orange roots glow */
+        .splash-roots {
+          position: absolute;
+          bottom: 26%;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 200px;
+          height: 120px;
+          background: radial-gradient(
+            ellipse,
+            rgba(255,140,20,0.28) 0%,
+            transparent 70%
+          );
+          filter: blur(14px);
+          animation: rootPulse 3.5s ease-in-out infinite 1s;
+        }
+
+        /* Top dark fade */
+        .splash-fade-top {
+          position: absolute;
+          top: 0; left: 0; right: 0;
+          height: 22%;
+          background: linear-gradient(180deg, rgba(3,8,20,0.70) 0%, transparent 100%);
+        }
+
+        /* Bottom warm-dark fade */
+        .splash-fade-bottom {
+          position: absolute;
+          bottom: 0; left: 0; right: 0;
+          height: 60%;
+          background: linear-gradient(
+            0deg,
+            rgba(3,6,18,0.98) 0%,
+            rgba(5,10,30,0.94) 22%,
+            rgba(8,18,55,0.80) 42%,
+            rgba(12,30,80,0.50) 60%,
+            transparent 100%
+          );
+        }
+
+        /* Film grain */
+        .splash-grain {
+          position: absolute;
+          inset: 0;
+          pointer-events: none;
+          opacity: 0.03;
+          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
+        }
+
+        /* WINDO top label */
+        .splash-windo {
+          position: absolute;
+          top: 44px;
+          left: 0; right: 0;
+          text-align: center;
+          font-family: 'Cinzel', serif;
+          font-size: 11px;
+          letter-spacing: 0.38em;
+          color: rgba(160,200,255,0.45);
+          text-shadow: 0 0 20px rgba(100,160,255,0.3);
+          z-index: 10;
+        }
+
+        /* Bottom content block */
+        .splash-content {
+          position: absolute;
+          bottom: 0; left: 0; right: 0;
+          padding: 0 28px 52px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          z-index: 10;
+        }
+
+        /* App name */
+        .splash-title {
+          font-family: 'Cormorant Garamond', serif;
+          font-size: clamp(52px, 15vw, 72px);
+          font-weight: 700;
+          color: #FFFFFF;
+          letter-spacing: 0.06em;
+          line-height: 1;
+          text-align: center;
+          text-shadow:
+            0 0 60px rgba(100,160,255,0.4),
+            0 0 120px rgba(60,100,200,0.2),
+            0 2px 20px rgba(0,0,0,0.8);
+        }
+
+        /* Tagline */
+        .splash-tagline {
+          font-family: 'Cormorant Garamond', serif;
+          font-style: italic;
+          font-size: 16px;
+          color: rgba(180,210,255,0.5);
+          letter-spacing: 0.08em;
+          margin-top: 8px;
+          text-align: center;
+        }
+
+        /* Ornament divider */
+        .splash-ornament {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          margin: 20px 0 22px;
+        }
+
+        .orn-line {
+          display: block;
+          width: 56px;
+          height: 1px;
+          background: linear-gradient(90deg, transparent, rgba(180,210,255,0.4));
+        }
+
+        .orn-line-rev {
+          background: linear-gradient(270deg, transparent, rgba(180,210,255,0.4));
+        }
+
+        .orn-diamond {
+          display: block;
+          width: 6px;
+          height: 6px;
+          background: #6AAAF0;
+          transform: rotate(45deg);
+          box-shadow: 0 0 10px rgba(106,170,240,0.7);
+        }
+
+        /* CTA button */
+        .splash-cta {
+          width: 100%;
+          padding: 17px;
+          background: linear-gradient(135deg, #1A50A0, #2870C8, #3A90E0);
+          border-radius: 14px;
+          border: 1px solid rgba(100,180,255,0.25);
+          font-family: 'Cinzel', serif;
+          font-size: 13px;
+          font-weight: 500;
+          color: #E8F4FF;
+          letter-spacing: 0.18em;
+          text-transform: uppercase;
+          cursor: pointer;
+          transition: all 0.25s ease;
+          box-shadow:
+            0 8px 32px rgba(26,80,160,0.55),
+            0 1px 0 rgba(255,255,255,0.15) inset;
+        }
+
+        .splash-cta:hover {
+          background: linear-gradient(135deg, #2060B8, #3080D8, #4AA0F0);
+          transform: translateY(-1px);
+          box-shadow: 0 12px 40px rgba(26,80,160,0.65), 0 1px 0 rgba(255,255,255,0.15) inset;
+        }
+
+        .splash-cta:active {
+          transform: scale(0.97) translateY(0);
+        }
+
+        /* Sign in link */
+        .splash-signin {
+          margin-top: 16px;
+          background: none;
+          border: none;
+          font-family: 'Cormorant Garamond', serif;
+          font-style: italic;
+          font-size: 14px;
+          color: rgba(180,210,255,0.28);
+          cursor: pointer;
+          transition: color 0.2s;
+        }
+
+        .splash-signin span {
+          color: rgba(106,170,240,0.55);
+          text-decoration: underline;
+          text-underline-offset: 3px;
+        }
+
+        .splash-signin:hover {
+          color: rgba(180,210,255,0.5);
+        }
+
+        /* Animations */
+        .splash-in-down {
+          animation: fadeInDown 1s cubic-bezier(0.16,1,0.3,1) both;
+        }
+
+        .splash-in-up {
+          animation: fadeInUp 1s cubic-bezier(0.16,1,0.3,1) both;
+        }
+
+        @keyframes fadeInDown {
+          from { opacity: 0; transform: translateY(-14px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInUp {
+          from { opacity: 0; transform: translateY(18px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes sunPulse {
+          0%, 100% { opacity: 0.8; transform: translateX(-50%) scale(1); }
+          50%       { opacity: 1;   transform: translateX(-50%) scale(1.12); }
+        }
+
+        @keyframes rootPulse {
+          0%, 100% { opacity: 0.7; }
+          50%       { opacity: 1; }
+        }
+      `}</style>
     </div>
   )
-          }
-          
+}
