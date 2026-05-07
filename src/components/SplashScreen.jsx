@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import BaobabSVG from './BaobabSVG'
 
 export default function SplashScreen() {
   const router = useRouter()
@@ -14,17 +15,13 @@ export default function SplashScreen() {
   return (
     <div className="splash-root">
 
-      {/* ── Background image ── */}
-      <div className="splash-bg" />
+      {/* ── Baobab SVG full background ── */}
+      <div className="splash-baobab">
+        <BaobabSVG style={{ width: '100%', height: '100%' }} />
+      </div>
 
       {/* ── Blue night overlay ── */}
       <div className="splash-night" />
-
-      {/* ── Sun glow behind baobab ── */}
-      <div className="splash-sun" />
-
-      {/* ── Root amber glow ── */}
-      <div className="splash-roots" />
 
       {/* ── Top fade ── */}
       <div className="splash-fade-top" />
@@ -43,19 +40,25 @@ export default function SplashScreen() {
       {/* ── Bottom content ── */}
       <div className="splash-content">
 
-        <h1 className={`splash-title ${loaded ? 'splash-in-up' : 'opacity-0'}`}
-            style={{ animationDelay: '0.3s' }}>
+        <h1
+          className={`splash-title ${loaded ? 'splash-in-up' : 'opacity-0'}`}
+          style={{ animationDelay: '0.3s' }}
+        >
           Racines
         </h1>
 
-        <p className={`splash-tagline ${loaded ? 'splash-in-up' : 'opacity-0'}`}
-           style={{ animationDelay: '0.5s' }}>
+        <p
+          className={`splash-tagline ${loaded ? 'splash-in-up' : 'opacity-0'}`}
+          style={{ animationDelay: '0.5s' }}
+        >
           Ta lignée · Ton histoire
         </p>
 
-        {/* ornament */}
-        <div className={`splash-ornament ${loaded ? 'splash-in-up' : 'opacity-0'}`}
-             style={{ animationDelay: '0.7s' }}>
+        {/* Ornament divider */}
+        <div
+          className={`splash-ornament ${loaded ? 'splash-in-up' : 'opacity-0'}`}
+          style={{ animationDelay: '0.7s' }}
+        >
           <span className="orn-line" />
           <span className="orn-diamond" />
           <span className="orn-line orn-line-rev" />
@@ -80,6 +83,7 @@ export default function SplashScreen() {
       </div>
 
       <style jsx>{`
+
         .splash-root {
           position: fixed;
           inset: 0;
@@ -88,85 +92,52 @@ export default function SplashScreen() {
           font-family: 'Cinzel', serif;
         }
 
-        /* Background baobab image */
-        .splash-bg {
+        /* BaobabSVG plein écran */
+        .splash-baobab {
           position: absolute;
           inset: 0;
-          background-image: url('/images/baobab.png');
-          background-size: cover;
-          background-position: center 20%;
+          width: 100%;
+          height: 100%;
         }
 
-        /* Deep blue night overlay */
+        .splash-baobab svg {
+          width: 100%;
+          height: 100%;
+          display: block;
+        }
+
+        /* Blue night overlay */
         .splash-night {
           position: absolute;
           inset: 0;
           background: linear-gradient(
             180deg,
-            rgba(3,8,30,0.65) 0%,
-            rgba(8,18,60,0.50) 15%,
-            rgba(15,35,90,0.35) 30%,
-            rgba(25,55,110,0.20) 45%,
-            rgba(40,70,120,0.10) 60%,
-            transparent 75%
+            rgba(3,8,30,0.45) 0%,
+            rgba(8,18,60,0.30) 20%,
+            rgba(15,35,90,0.15) 40%,
+            transparent 65%
           );
-        }
-
-        /* Golden sun glow center */
-        .splash-sun {
-          position: absolute;
-          top: 28%;
-          left: 50%;
-          transform: translateX(-50%);
-          width: 260px;
-          height: 260px;
-          border-radius: 50%;
-          background: radial-gradient(
-            circle,
-            rgba(255,180,60,0.22) 0%,
-            rgba(220,130,20,0.10) 45%,
-            transparent 70%
-          );
-          filter: blur(24px);
-          animation: sunPulse 5s ease-in-out infinite;
-        }
-
-        /* Orange roots glow */
-        .splash-roots {
-          position: absolute;
-          bottom: 26%;
-          left: 50%;
-          transform: translateX(-50%);
-          width: 200px;
-          height: 120px;
-          background: radial-gradient(
-            ellipse,
-            rgba(255,140,20,0.28) 0%,
-            transparent 70%
-          );
-          filter: blur(14px);
-          animation: rootPulse 3.5s ease-in-out infinite 1s;
         }
 
         /* Top dark fade */
         .splash-fade-top {
           position: absolute;
           top: 0; left: 0; right: 0;
-          height: 22%;
-          background: linear-gradient(180deg, rgba(3,8,20,0.70) 0%, transparent 100%);
+          height: 20%;
+          background: linear-gradient(180deg, rgba(3,8,20,0.65) 0%, transparent 100%);
         }
 
-        /* Bottom warm-dark fade */
+        /* Bottom dark-blue fade */
         .splash-fade-bottom {
           position: absolute;
           bottom: 0; left: 0; right: 0;
-          height: 60%;
+          height: 58%;
           background: linear-gradient(
             0deg,
             rgba(3,6,18,0.98) 0%,
             rgba(5,10,30,0.94) 22%,
             rgba(8,18,55,0.80) 42%,
-            rgba(12,30,80,0.50) 60%,
+            rgba(12,30,80,0.48) 60%,
             transparent 100%
           );
         }
@@ -312,7 +283,7 @@ export default function SplashScreen() {
           color: rgba(180,210,255,0.5);
         }
 
-        /* Animations */
+        /* ── Animations ── */
         .splash-in-down {
           animation: fadeInDown 1s cubic-bezier(0.16,1,0.3,1) both;
         }
@@ -331,15 +302,6 @@ export default function SplashScreen() {
           to   { opacity: 1; transform: translateY(0); }
         }
 
-        @keyframes sunPulse {
-          0%, 100% { opacity: 0.8; transform: translateX(-50%) scale(1); }
-          50%       { opacity: 1;   transform: translateX(-50%) scale(1.12); }
-        }
-
-        @keyframes rootPulse {
-          0%, 100% { opacity: 0.7; }
-          50%       { opacity: 1; }
-        }
       `}</style>
     </div>
   )
